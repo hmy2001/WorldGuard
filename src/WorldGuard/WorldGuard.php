@@ -23,7 +23,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 
 class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 
-	public function onEnable(){//Œã‚Å–|–ó
+	public function onEnable(){//å¾Œã§ç¿»è¨³
 		$this->getLogger()->info("WorldGuard loaded!");
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
                 @mkdir($this->getDataFolder());
@@ -32,20 +32,34 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                 //$this->dbManager = new WorldGuardDatabaseManager($this->getDataFolder());
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+        	$username = $sender->getName();
+                if(!($sender instanceof Player)){
+                $sender->sendMessage("Please run this command in-game.");
+                return true;
+                break;
+                }
+        	switch($command->getName()){
+       		case "/region":
+                	if(!isset($args[0]) and $args[0] === ""){
+                		$sender->sendMessage("Test Message");
+                	return true;
+                	break;
+                	}
+                	switch($args[0]){
+                	case "":
+                		$sender->sendMessage("Test Message");
+                	
+                	
+                	
+                	
+                	
+                	break;
+                	}
+                break;
+                }
+                return true;
+	}
 
 	public function onDisable(){
                 //save function

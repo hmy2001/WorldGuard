@@ -10,7 +10,6 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-//use pocketmine\utils\Config;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\block\Block;
@@ -23,16 +22,17 @@ use pocketmine\event\player\PlayerInteractEvent;
 
 class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 
-	public function onEnable(){//後で翻訳
-		$this->getLogger()->info("WorldGuard loaded!");
+	public function onEnable(){
+		$this->getLogger()->info("WorldGuardを読み込みました。");
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
                 @mkdir($this->getDataFolder());
-		//$this->config = new Config($this->getDataFolder()."config.yml", Config::YAML, array());
-		//$this->config->save();
-                //$this->dbManager = new WorldGuardDatabaseManager($this->getDataFolder());
+                if(!$this->pluginsession = new PluginSession($this->getDataFolder())){
+                $this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
+                $this->getServer()->shutdown();
+                }
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+	public function onCommand(CommandSender $sender, Command $command, $label, array $args){//後で翻訳
         	$username = $sender->getName();
                 if(!($sender instanceof Player)){
                 $sender->sendMessage("Please run this command in-game.");
@@ -63,7 +63,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 
 	public function onDisable(){
                 //save function
-		$this->getLogger()->info("WorldGuard was to save the area information!");
+		$this->getLogger()->info("WorldGuardのエリア情報を保存しました。");
 	}
 
 }

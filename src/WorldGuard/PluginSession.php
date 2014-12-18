@@ -11,9 +11,19 @@ use WEdit\WEdit;
 
 class PluginSession{
 
-public function __construct($dataFolder){
-$this->DataFolder = $dataFolder;
-}
+	public function __construct($dataFolder){
+		$this->DataFolder = $dataFolder;
+                $this->plugin = false;
+		foreach($this->getServer()->getPluginManager()->getPlugins() as $plugin){
+			if($plugin->getName() === "WorldEditor" or $plugin->getName() === "WEdit"){
+				$this->plugin = $plugin;
+			}
+		}
+                if(!$this->plugin){
+                	return false;
+                }
+                return true;
+	}
 
 
 

@@ -10,7 +10,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-use pocketmine\utils\Config;
+//use pocketmine\utils\Config;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\block\Block;

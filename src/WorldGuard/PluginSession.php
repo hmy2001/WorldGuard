@@ -14,7 +14,7 @@ class PluginSession{
 	public function __construct($dataFolder){
 		$this->DataFolder = $dataFolder;
                 $this->plugin = false;
-		foreach($this->getServer()->getPluginManager()->getPlugins() as $plugin){
+		foreach(Server::getInstance()->getPluginManager()->getPlugins() as $plugin){
 			if($plugin->getName() === "WorldEditor" or $plugin->getName() === "WEdit"){
 				$this->plugin = $plugin;
 			}
@@ -25,9 +25,9 @@ class PluginSession{
                 return true;
 	}
 
-
-
-
+	public function getPluginName(){
+		return $this->plugin->getName();
+	}
 
 
 

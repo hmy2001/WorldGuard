@@ -27,8 +27,10 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
                 @mkdir($this->getDataFolder());
                 if(!$this->pluginsession = new PluginSession($this->getDataFolder())){
-                $this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
-                $this->getServer()->shutdown();
+                	$this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
+                	$this->getServer()->shutdown();
+                }else{
+                	$this->getLogger()->info(TextFormat::GREEN."".$this->pluginsession->getPluginName()."".TextFormat::WHITE."を読み込みました。");
                 }
 	}
 

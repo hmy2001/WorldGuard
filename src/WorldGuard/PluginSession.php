@@ -15,10 +15,23 @@ class PluginSession{
 		$this->DataFolder = $dataFolder;
                 $this->plugin = false;
 		foreach(Server::getInstance()->getPluginManager()->getPlugins() as $plugin){
-			if($plugin->getName() === "WorldEditor" or $plugin->getName() === "WEdit"){
-				$this->plugin = $plugin;
-			}
-		}
+                        switch($plugin->getName()){
+                        case "WorldEditor":
+                        if($plugin->getDescription()->getVersion() === "1.0.3"){
+			$this->plugin = $plugin;
+                        }else{
+                	return false;
+                        }
+                        break;
+                        case "WEdit":
+                        if($plugin->getDescription()->getVersion() === "2.0.0"){
+			$this->plugin = $plugin;
+                        }else{
+                	return false;
+                        }
+                        break;
+		        }
+                }
                 if(!$this->plugin){
                 	return false;
                 }

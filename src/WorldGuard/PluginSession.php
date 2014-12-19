@@ -47,7 +47,7 @@ class PluginSession{
 		switch($this->getPluginName()){
 		case "WorldEditor":
                 $session = $this->plugin->session($player);
-                if(if(!is_array($session) or $session[0][0] === false or $session[0][1] === false or $session[0][0][3] !== $session[0][1][3]){){
+                if(!is_array($session) or $session[0][0] === false or $session[0][1] === false or $session[0][0][3] !== $session[0][1][3]){
 		return $session;
                 }else{
                 return false;

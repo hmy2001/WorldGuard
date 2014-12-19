@@ -5,6 +5,7 @@ namespace WorldGuard;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 //use pocketmine\utils\Config;
+use pocketmine\Player;
 
 use WorldEditor\WorldEditor;
 use WEdit\WEdit;
@@ -42,11 +43,21 @@ class PluginSession{
 		return $this->plugin->getName();
 	}
 
-
-
-
-
-
+	public function getSession(Player $player){
+		switch($this->getPluginName()){
+		case "WorldEditor":
+                $session = $this->plugin->session($player);
+                if(if(!is_array($session) or $session[0][0] === false or $session[0][1] === false or $session[0][0][3] !== $session[0][1][3]){){
+		return $session;
+                }else{
+                return false;
+                }
+		break;
+		case "WEdit":
+		return ;
+		break;
+		}
+        }
 
 
 

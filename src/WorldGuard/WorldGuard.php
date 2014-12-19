@@ -32,6 +32,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                 }else{
                 	$this->getLogger()->info(TextFormat::GREEN."".$this->pluginsession->getPluginName()."".TextFormat::WHITE."を読み込みました。");
                 }
+	        $this->dbManager = new WorldGuardDatabaseManager($this->getDataFolder());
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, $label, array $args){//後で翻訳
@@ -44,19 +45,27 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
         	switch($command->getName()){
        		case "/region":
                 	if(!isset($args[0]) and $args[0] === ""){
-                		$sender->sendMessage("Test Message");
+                                $sender->sendMessage("usage: //region claim [Name]\n".
+                                                     "usage: //region remove [Name]\n".
+                                                     "usage: //region info [Name]\n".
+                                                     "usage: //region select [Name]\n".
+                                                     "usage: //region list [PageName]"
+                                                     );
                 	return true;
                 	break;
                 	}
                 	switch($args[0]){
-                	case "":
+                	case "claim":
                 		$sender->sendMessage("Test Message");
-                	
-                	
-                	
-                	
-                	
                 	break;
+                        default:
+                                $sender->sendMessage("usage: //region claim [Name]\n".
+                                                     "usage: //region remove [Name]\n".
+                                                     "usage: //region info [Name]\n".
+                                                     "usage: //region select [Name]\n".
+                                                     "usage: //region list [PageName]"
+                                                     );
+                        break;
                 	}
                 break;
                 }

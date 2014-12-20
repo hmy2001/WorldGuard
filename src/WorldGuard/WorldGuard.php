@@ -44,7 +44,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                 }
         	switch($command->getName()){
        		case "/region":
-                	if(!isset($args[0]) and $args[0] === ""){
+                	if(!isset($args[0]) or $args[0] === ""){
                                 $sender->sendMessage("使用法: //region claim [名前]\n".
                                                      "使用法: //region remove [名前]\n".
                                                      "使用法: //region info [名前]\n".
@@ -60,7 +60,8 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 				$sender->sendMessage("使用法: //region claim [名前]");
 				break;
 				}
-				if(!$this->dbManager->getName($sender,$name = $args[1])->fetchArray(SQLITE3_ASSOC)){
+				//if(!$this->dbManager->getName($sender,$name = $args[1])->fetchArray(SQLITE3_ASSOC)){
+                                if(!$this->dbManager->getName($sender,$name = $args[1])){
 					$sender->sendMessage("".$name."の名前のエリアは存在しています。");
                                 break;
                                 }
@@ -87,13 +88,13 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 	}
 
 	public function WG_claim($player,$name,$session){
+		$minx = 
+		$maxx = 
+		$miny = 
+		$maxy = 
+		$minz = 
+		$maxz = 
 		//TODO
-		
-		
-		
-		
-		
-		
 
 
 

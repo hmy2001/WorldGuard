@@ -88,12 +88,13 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 	}
 
 	public function WG_claim($player,$name,$session){
-		$minx = 
-		$maxx = 
-		$miny = 
-		$maxy = 
-		$minz = 
-		$maxz = 
+		$minx = $session[0][0][0];
+		$maxx = $session[0][0][1]:
+		$miny = $session[0][1][0];
+		$maxy = $session[0][1][1];
+		$minz = $session[0][2][0];
+		$maxz = $session[0][2][1];
+                if(){
 		//TODO
 
 

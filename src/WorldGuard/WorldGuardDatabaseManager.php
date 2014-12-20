@@ -15,7 +15,7 @@ class WorldGuardDatabaseManager{
 	}
 
 	public function getName($player,$name){
-                foreach($this->config->getAll() as $ => $){
+                foreach($this->config->getAll() as $playername => $){
                 return $data;
 	}
 

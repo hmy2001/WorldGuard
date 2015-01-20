@@ -2,7 +2,7 @@
 
 namespace WorldGuard;
 
-use pocketmine\level\Position;
+use pocketmine\utils\Config;
 
 class WorldGuardDatabaseManager{
 
@@ -10,13 +10,24 @@ class WorldGuardDatabaseManager{
     private $config;
 
     public function __construct($path){
-		$this->config = new Config($path. "WorldGuard.yml",CONFIG::YAML);
+		$this->config = new Config($path. "WorldGuard.yml",Config::YAML);
                 $this->config->save();
 	}
 
-	public function getName($player,$name){
-                foreach($this->config->getAll() as $playername => $){
-                return $data;
+	public function getNameArea($player,$name){
+                //foreach($this->config->getAll() as $playername => $){
+                //return $data;
+	}
+
+	public function setNameArea($player,$name,$areadata){
+                //foreach($this->config->getAll() as $playername => $){
+                //return $data;
+	}
+
+
+
+	public function saveData(){
+                $this->config->save();
 	}
 
 }

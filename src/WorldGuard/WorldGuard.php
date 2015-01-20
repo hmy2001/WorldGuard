@@ -60,7 +60,6 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 				$sender->sendMessage("使用法: //region claim [名前]");
 				break;
 				}
-				//if(!$this->dbManager->getName($sender,$name = $args[1])->fetchArray(SQLITE3_ASSOC)){
                                 if(!$this->dbManager->getName($sender,$name = $args[1])){
 					$sender->sendMessage("".$name."の名前のエリアは存在しています。");
                                 break;
@@ -71,8 +70,23 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                                 }else{
                                 	$sender->sendMessage("範囲指定がされておりません。");
                                 }
-                		//$sender->sendMessage("Test Message");
                 	break;
+                	case "remove":
+
+
+                        break;
+                	case "info":
+
+
+                        break;
+                	case "select":
+
+
+                        break;
+                	case "list":
+
+
+                        break;
                         default:
                                 $sender->sendMessage("使用法: //region claim [名前]\n".
                                                      "使用法: //region remove [名前]\n".
@@ -94,16 +108,16 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 		$maxy = $session[0][1][1];
 		$minz = $session[0][2][0];
 		$maxz = $session[0][2][1];
-                if(){
-		//TODO
-
-
-
-
+                $areadata = [$minx,$maxx,$miny,$maxy,$minz,$maxz];
+                if($this->dbManager->setNameArea($player,$name,$areadata)){
+                        $player->sendMessage("範囲登録に成功しました。");
+                }else{
+                        $player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");
+                }
         }
 
 	public function onDisable(){
-                //save function TODO
+                $this->dbManager->saveData();
 		$this->getLogger()->info("WorldGuardのエリア情報を保存しました。");
 	}
 

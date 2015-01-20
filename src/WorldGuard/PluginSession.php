@@ -4,11 +4,7 @@ namespace WorldGuard;
 
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
-//use pocketmine\utils\Config;
 use pocketmine\Player;
-
-use WorldEditor\WorldEditor;
-use WEdit\WEdit;
 
 class PluginSession{
 
@@ -54,7 +50,7 @@ class PluginSession{
                 }
 		break;
 		case "WEdit":
-		return ;
+		
 		break;
 		}
         }

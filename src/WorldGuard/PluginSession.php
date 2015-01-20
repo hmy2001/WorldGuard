@@ -15,16 +15,16 @@ class PluginSession{
                         switch($plugin->getName()){
                         case "WorldEditor":
                         if($plugin->getDescription()->getVersion() === "1.0.3"){
-			$this->plugin = $plugin;
+			        $this->plugin = $plugin;
                         }else{
-                	return false;
+                	        return false;
                         }
                         break;
                         case "WEdit":
                         if($plugin->getDescription()->getVersion() === "2.0.0"){
-			$this->plugin = $plugin;
+			        $this->plugin = $plugin;
                         }else{
-                	return false;
+                	        return false;
                         }
                         break;
 		        }
@@ -44,9 +44,9 @@ class PluginSession{
 		case "WorldEditor":
                 $session = $this->plugin->session($player);
                 if(!is_array($session) or $session[0][0] === false or $session[0][1] === false or $session[0][0][3] !== $session[0][1][3]){
-		return $session;
+		        return $session;
                 }else{
-                return false;
+                        return false;
                 }
 		break;
 		case "WEdit":

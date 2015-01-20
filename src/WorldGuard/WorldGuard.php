@@ -60,7 +60,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 				$sender->sendMessage("使用法: //region claim [名前]");
 				break;
 				}
-                                if(!$this->dbManager->getName($sender,$name = $args[1])){
+                                if(!$this->dbManager->getNameArea($sender,$name = $args[1])){
 					$sender->sendMessage("".$name."の名前のエリアは存在しています。");
                                 break;
                                 }
@@ -72,20 +72,19 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                                 }
                 	break;
                 	case "remove":
-
-
+				
+				
                         break;
                 	case "info":
-
-
+				
+				
                         break;
                 	case "select":
-
-
+				
+				
                         break;
                 	case "list":
-
-
+				return $this->dbManager->getList($sender);
                         break;
                         default:
                                 $sender->sendMessage("使用法: //region claim [名前]\n".
@@ -112,7 +111,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
                 if($this->dbManager->setNameArea($player,$name,$areadata)){
                         $player->sendMessage("範囲登録に成功しました。");
                 }else{
-                        $player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");
+                        $player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");//多分ならない
                 }
         }
 

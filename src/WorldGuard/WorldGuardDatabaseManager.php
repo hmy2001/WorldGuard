@@ -14,9 +14,15 @@ class WorldGuardDatabaseManager{
                 $this->config->save();
 	}
 
-	public function getNameArea($player,$name){
-                //foreach($this->config->getAll() as $playername => $){
-                //return $data;
+	public function getNameArea($playername,$name){
+                foreach($this->config->getAll() as $playername => $areadataall){
+                        foreach($areadataall as $areaname => $aredata){
+                                if($areaname === $name){
+                                        return true;
+                                }
+                        }
+                }
+                return false;
 	}
 
 	public function setNameArea($player,$name,$areadata){

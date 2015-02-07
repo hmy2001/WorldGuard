@@ -26,7 +26,8 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 		$this->getLogger()->info("WorldGuardを読み込みました。");
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
                 @mkdir($this->getDataFolder());
-                if(!$this->pluginsession = new PluginSession($this->getDataFolder())){
+                $this->pluginsession = new PluginSession($this->getDataFolder());
+                if(!$this->pluginsession->Enabled()){
                 	$this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
                 	$this->getServer()->shutdown();
                 }else{
@@ -60,12 +61,12 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 				$sender->sendMessage("使用法: //region claim [名前]");
 				break;
 				}
-                                if(!$this->dbManager->getNameArea($sender,$name = $args[1])){
-					$sender->sendMessage("".$name."の名前のエリアは存在しています。");
+                                if($this->dbManager->getNameArea($sender,$name = $args[1])){
+					$sender->sendMessage("".$name."のエリアは存在しています。");
                                 break;
                                 }
-                                $session = $this->pluginsession->getSession($sender)["selection"];
-                                if(!$session){
+                                $session = $this->pluginsession->getSession($sender);
+                                if(is_array($session)){
                                         $this->WG_claim($sender,$name,$session);
                                 }else{
                                 	$sender->sendMessage("範囲指定がされておりません。");
@@ -84,7 +85,7 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 				
                         break;
                 	case "list":
-				return $this->dbManager->getList($sender);
+				$this->dbManager->getList($sender);
                         break;
                         default:
                                 $sender->sendMessage("使用法: //region claim [名前]\n".
@@ -101,17 +102,18 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 	}
 
 	public function WG_claim($player,$name,$session){
-		$minx = $session[0][0][0];
-		$maxx = $session[0][0][1]:
-		$miny = $session[0][1][0];
-		$maxy = $session[0][1][1];
-		$minz = $session[0][2][0];
-		$maxz = $session[0][2][1];
-                $areadata = [$minx,$maxx,$miny,$maxy,$minz,$maxz];
+		$minx = min($session[1][0], $session[2][0]);
+		$miny = min($session[1][1], $session[2][1]);
+		$minz = min($session[1][2], $session[2][2]);
+		$maxx = max($session[1][0], $session[2][0]);
+		$maxy = max($session[1][1], $session[2][1]);
+		$maxz = max($session[1][2], $session[2][2]);
+                $level = $session[3];
+                $areadata = [$minx,$maxx,$miny,$maxy,$minz,$maxz,$level];
                 if($this->dbManager->setNameArea($player,$name,$areadata)){
                         $player->sendMessage("範囲登録に成功しました。");
                 }else{
-                        $player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");//多分ならない
+                        $player->sendMessage("範囲登録に失敗しました。エリア競合が原因だと考えられます。");
                 }
         }
 

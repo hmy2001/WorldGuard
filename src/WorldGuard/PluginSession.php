@@ -5,12 +5,16 @@ namespace WorldGuard;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
 
 class PluginSession{
 
 	public function __construct($dataFolder){
 		$this->DataFolder = $dataFolder;
-                $this->plugin = false;
+	}
+
+	public function Enabled(){
+		$this->plugin = false;
 		foreach(Server::getInstance()->getPluginManager()->getPlugins() as $plugin){
                         switch($plugin->getName()){
                         case "WorldEditor":
@@ -21,7 +25,7 @@ class PluginSession{
                         }
                         break;
                         case "WEdit":
-                        if($plugin->getDescription()->getVersion() === "2.0.0"){
+                        if($plugin->getDescription()->getVersion() === "2.0.1"){
 			        $this->plugin = $plugin;
                         }else{
                 	        return false;
@@ -29,8 +33,8 @@ class PluginSession{
                         break;
 		        }
                 }
-                if(!$this->plugin){
-                	return false;
+		if(!$this->plugin instanceof Plugin){
+		        return false;
                 }
                 return true;
 	}
@@ -39,18 +43,35 @@ class PluginSession{
 		return $this->plugin->getName();
 	}
 
-	public function getSession(Player $player){
+	public function getSession($player){
 		switch($this->getPluginName()){
 		case "WorldEditor":
-                $session = $this->plugin->session($player);
-                if(!is_array($session) or $session[0][0] === false or $session[0][1] === false or $session[0][0][3] !== $session[0][1][3]){
-		        return $session;
+                $session = $this->plugin->session($player)["selection"];
+		if(is_array($session)){
+                        if(isset($session[0][0]) and isset($session[0][1]) and $session[0][0][3]->getName() === $session[0][1][3]->getName()){
+                                $data[1][0] = $session[0][0];
+                                $data[1][1] = $session[0][1];
+                                $data[1][2] = $session[0][2];
+                                $data[2][0] = $session[1][0];
+                                $data[2][1] = $session[1][1];
+                                $data[2][2] = $session[1][2];
+                                $data[3] = $session[0][0][3];
+                                return $data;
+			}else{
+				return false;
+			}
                 }else{
-                        return false;
+			return false;
                 }
 		break;
 		case "WEdit":
-		
+			$session = $this->plugin->getSession($player);
+                        if(is_array($session)){
+                                $session[3] = $player->getLevel()->getName();
+                        	return $session;
+                        }else{
+                        	return false;
+                        }
 		break;
 		}
         }

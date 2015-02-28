@@ -11,10 +11,10 @@ class PluginSession{
 
 	public function __construct($dataFolder){
 		$this->DataFolder = $dataFolder;
+		$this->plugin = false;
 	}
 
 	public function Enabled(){
-		$this->plugin = false;
 		foreach(Server::getInstance()->getPluginManager()->getPlugins() as $plugin){
                         switch($plugin->getName()){
                         case "WorldEditor":
@@ -48,14 +48,14 @@ class PluginSession{
 		case "WorldEditor":
                 $session = $this->plugin->session($player)["selection"];
 		if(is_array($session)){
-                        if(isset($session[0][0]) and isset($session[0][1]) and $session[0][0][3]->getName() === $session[0][1][3]->getName()){
+                        if(isset($session[0][0]) and isset($session[0][1]) and $session[0][3]->getName() === $session[1][3]->getName()){
                                 $data[1][0] = $session[0][0];
                                 $data[1][1] = $session[0][1];
                                 $data[1][2] = $session[0][2];
                                 $data[2][0] = $session[1][0];
                                 $data[2][1] = $session[1][1];
                                 $data[2][2] = $session[1][2];
-                                $data[3] = $session[0][0][3];
+                                $data[3] = $session[0][3]->getName();;
                                 return $data;
 			}else{
 				return false;
@@ -75,19 +75,5 @@ class PluginSession{
 		break;
 		}
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

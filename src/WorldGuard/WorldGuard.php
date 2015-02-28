@@ -36,6 +36,11 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 	        $this->dbManager = new WorldGuardDatabaseManager($this->getDataFolder());
 	}
 
+	public function onDisable(){
+                $this->dbManager->saveData();
+		$this->getLogger()->info("WorldGuardのエリア情報を保存しました。");
+	}
+
 	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
         	$username = $sender->getName();
                 if(!($sender instanceof Player)){
@@ -109,17 +114,76 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 		$maxy = max($session[1][1], $session[2][1]);
 		$maxz = max($session[1][2], $session[2][2]);
                 $level = $session[3];
-                $areadata = [$minx,$maxx,$miny,$maxy,$minz,$maxz,$level];
-                if($this->dbManager->setNameArea($player,$name,$areadata)){
-                        $player->sendMessage("範囲登録に成功しました。");
+                $areadata = [$minx,$miny,$minz,$maxx,$maxy,$maxz,$level];
+                $result = $this->dbManager->setNameArea($player,$name,$areadata);
+                if($result){
+			$player->sendMessage("範囲登録に成功しました。");
                 }else{
-                        $player->sendMessage("範囲登録に失敗しました。エリア競合が原因だと考えられます。");
+			$player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");
                 }
         }
 
-	public function onDisable(){
-                $this->dbManager->saveData();
-		$this->getLogger()->info("WorldGuardのエリア情報を保存しました。");
-	}
+	public function onBlockPlace(BlockPlaceEvent $event){
+                $player = $event->getPlayer();
+                $username = $player->getName();
+                $block = $event->getBlock();
+                $areaes = $this->dbManager->getAreaes();
+                foreach($areaes as $playername => $areadataall){
+                        foreach($areadataall as $areaname => $areadata){
+                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
+                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
+                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
+                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username and $block->getLevel()->getName() === $areadata["level"]){
+                                                                $event->setCancelled();
+                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
+
+	public function onBlockBreak(BlockBreakEvent $event){
+                $player = $event->getPlayer();
+                $username = $player->getName();
+                $block = $event->getBlock();
+                $areaes = $this->dbManager->getAreaes();
+                foreach($areaes as $playername => $areadataall){
+                        foreach($areadataall as $areaname => $areadata){
+                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
+                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
+                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
+                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username){
+                                                                $event->setCancelled();
+                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
+
+	public function onPlayerTouch(PlayerInteractEvent $event){
+                $player = $event->getPlayer();
+                $username = $player->getName();
+                $block = $event->getBlock();
+                $areaes = $this->dbManager->getAreaes();
+                foreach($areaes as $playername => $areadataall){
+                        foreach($areadataall as $areaname => $areadata){
+                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
+                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
+                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
+                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username){
+                                                                $event->setCancelled();
+                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
 
 }

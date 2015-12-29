@@ -157,6 +157,10 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 							$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
 							break;
 						}
+						if($args[2] === $sender->getName()){
+							$sender->sendMessage("[WorldGuard] プレイヤー名に自分を指定することは出来ません。");
+							break;
+						}
 
 						$this->DataBaseManager->setGuardArea($sender, $name, "update", ["Type" => "addmember", "PlayerName" => $args[2]]);
 					break;
@@ -168,6 +172,11 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 						$name = $args[1];
 						if($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()) === false){
 							$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
+							break;
+						}
+
+						if($args[2] === $sender->getName()){
+							$sender->sendMessage("[WorldGuard] プレイヤー名に自分を指定することは出来ません。");
 							break;
 						}
 

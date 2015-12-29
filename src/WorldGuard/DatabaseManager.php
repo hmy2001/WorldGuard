@@ -83,16 +83,20 @@ class DatabaseManager{
 					switch($areadata["Type"]){
 						case "addmember":
 							if(isset($areadata["PlayerName"]) and isset($this->GuardData[$player->getLevel()->getName()][$areaname])){
-								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$areadata["PlayerName"]])){
-									$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の管理者です。");
-								}else{
-									$this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]] = false;
-									$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんを".$areaname."の管理者に追加しました。");
-									$member = $player->getServer()->getPlayerExact($areadata["PlayerName"]);
-									if($member instanceof Player){
-										$member->sendMessage("[WorldGuard] あなたは".$areaname."の管理者になりました。");
+								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$player->getName()])){
+									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$areadata["PlayerName"]])){
+										$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の管理者です。");
+									}else{
+										$this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]] = false;
+										$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんを".$areaname."の管理者に追加しました。");
+										$member = $player->getServer()->getPlayerExact($areadata["PlayerName"]);
+										if($member instanceof Player){
+											$member->sendMessage("[WorldGuard] あなたは".$areaname."の管理者になりました。");
+										}
+										$this->saveData();
 									}
-									$this->saveData();
+								}else{
+									$player->sendMessage("[WorldGuard] あなたは".$areaname."の管理者ではありません。");
 								}
 							}else{
 								$player->sendMessage("[WorldGuard] Error..... Report to Hmy2001!");
@@ -101,16 +105,20 @@ class DatabaseManager{
 						case "removemember":
 							if(isset($areadata["PlayerName"]) and isset($this->GuardData[$player->getLevel()->getName()][$areaname])){
 								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]])){
-									if($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]]){
-										$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の絶対的管理者なので削除できません。");
-									}else{
-										unset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]]);
-										$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんを".$areaname."の管理者から外しました。");
-										$member = $player->getServer()->getPlayerExact($areadata["PlayerName"]);
-										if($member instanceof Player){
-											$member->sendMessage("[WorldGuard] あなたは".$areaname."の管理者から外されました。");
+									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$player->getName()])){
+										if($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]]){
+											$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の絶対的管理者なので削除できません。");
+										}else{
+											unset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]]);
+											$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんを".$areaname."の管理者から外しました。");
+											$member = $player->getServer()->getPlayerExact($areadata["PlayerName"]);
+											if($member instanceof Player){
+												$member->sendMessage("[WorldGuard] あなたは".$areaname."の管理者から外されました。");
+											}
+											$this->saveData();
 										}
-										$this->saveData();
+									}else{
+										$player->sendMessage("[WorldGuard] あなたは".$areaname."の管理者ではありません。");
 									}
 								}else{
 									$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の管理者ではありません。");

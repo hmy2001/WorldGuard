@@ -10,180 +10,224 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\utils\Config;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\block\Block;
-use pocketmine\item\Item;
 
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 
 class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 
 	public function onEnable(){
-		$this->getLogger()->info("WorldGuardを読み込みました。");
+		$this->getLogger()->info("WorldGuardを読み込みました！");
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-                @mkdir($this->getDataFolder());
-                $this->pluginsession = new PluginSession($this->getDataFolder());
-                if(!$this->pluginsession->Enabled()){
-                	$this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
-                	$this->getServer()->shutdown();
-                }else{
-                	$this->getLogger()->info(TextFormat::GREEN."".$this->pluginsession->getPluginName()."".TextFormat::WHITE."を読み込みました。");
-                }
-	        $this->dbManager = new WorldGuardDatabaseManager($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())) @mkdir($this->getDataFolder());
+		$this->PluginSession = new PluginSession();
+		if(!$this->PluginSession->Enabled()){
+			if($this->PluginSession->getPluginName() === ""){
+				$this->getLogger()->info(TextFormat::RED.$this->PluginSession->getPluginName().TextFormat::YELLOW."を最新版にしてください！！");
+			}else{
+				$this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
+			}
+			$this->getServer()->shutdown();
+		}else{
+			$this->getLogger()->info(TextFormat::GREEN."".$this->PluginSession->getPluginName()."".TextFormat::WHITE."を読み込みました。");
+		}
+		$this->DataBaseManager = new DatabaseManager($this->getDataFolder());
 	}
 
 	public function onDisable(){
-                $this->dbManager->saveData();
+		$this->DataBaseManager->saveData();
 		$this->getLogger()->info("WorldGuardのエリア情報を保存しました。");
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-        	$username = $sender->getName();
-                if(!($sender instanceof Player)){
-                $sender->sendMessage("このコマンドはゲーム内で実行してください。");
-                return true;
-                break;
-                }
-        	switch($command->getName()){
-       		case "/region":
-                	if(!isset($args[0]) or $args[0] === ""){
-                                $sender->sendMessage("使用法: //region claim [名前]\n".
-                                                     "使用法: //region remove [名前]\n".
-                                                     "使用法: //region info [名前]\n".
-                                                     "使用法: //region select [名前]\n".
-                                                     "使用法: //region list [ページ番号]"
-                                                     );
-                	return true;
-                	break;
-                	}
-                	switch($args[0]){
-                	case "claim":
-				if(!isset($args[1]) or $args[1] === ""){
-				$sender->sendMessage("使用法: //region claim [名前]");
-				break;
+		$username = $sender->getName();
+		$cmd = $command->getName();
+		if($cmd{0} === "/"){
+			$cmd = substr($cmd, 1);
+		}
+		switch($cmd){
+			case "region":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("このコマンドはゲーム内で実行してください。");
+					break;
 				}
-                                if($this->dbManager->getNameArea($sender,$name = $args[1])){
-					$sender->sendMessage("".$name."のエリアは存在しています。");
-                                break;
-                                }
-                                $session = $this->pluginsession->getSession($sender);
-                                if(is_array($session)){
-                                        $this->WG_claim($sender,$name,$session);
-                                }else{
-                                	$sender->sendMessage("範囲指定がされておりません。");
-                                }
-                	break;
-                	case "remove":
-				
-				
-                        break;
-                	case "info":
-				
-				
-                        break;
-                	case "select":
-				
-				
-                        break;
-                	case "list":
-				$this->dbManager->getList($sender);
-                        break;
-                        default:
-                                $sender->sendMessage("使用法: //region claim [名前]\n".
-                                                     "使用法: //region remove [名前]\n".
-                                                     "使用法: //region info [名前]\n".
-                                                     "使用法: //region select [名前]\n".
-                                                     "使用法: //region list [ページ番号]"
-                                                     );
-                        break;
-                	}
-                break;
-                }
-                return true;
+				if(!isset($args[0]) or $args[0] === ""){
+					$sender->sendMessage("使用方法: //region claim [登録名] 登録\n".
+										"使用方法: //region remove [登録名] 削除\n".
+										"使用方法: //region info [登録名]\n".
+										"使用方法: //region addmember [登録名] [プレーヤー名]\n".
+										"使用方法: //region removemember [登録名] [プレーヤー名]"
+					);
+					break;
+				}
+				switch($args[0]){
+					case "claim":
+						if(!isset($args[1]) or $args[1] === ""){
+							$sender->sendMessage("使用方法: //region claim [登録名]");
+							break;
+						}
+						$name = $args[1];
+						if(is_array($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()))){
+							$sender->sendMessage("[WorldGuard] ".$name."はすでに登録されています。");
+							break;
+						}
+						$session = $this->PluginSession->getSession($sender);
+						if(!is_array($session)){
+							$sender->sendMessage("範囲が設定されていません。");
+							break;
+						}
+						$this->DataBaseManager->setGuardArea($sender, $name, "create", $session);
+					break;
+					case "remove":
+						if(!isset($args[1]) or $args[1] === ""){
+							$sender->sendMessage("使用方法: //region remove [登録名]");
+							break;
+						}
+						$name = $args[1];
+						if($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()) === false){
+							$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
+							break;
+						}
+						$this->DataBaseManager->setGuardArea($sender, $name, "remove");
+					break;
+					case "info":
+						if(!isset($args[1]) or $args[1] === ""){
+							$result = $this->DataBaseManager->getGuardAreaInPosition($sender->getLevel()->getName(), (int) floor($sender->getX()), (int) floor($sender->getY()), (int) floor($sender->getZ()), $areaname);
+							if(is_array($result) and isset($result["PlayerData"])){
+								$members = "";
+								$num = 0;
+								foreach($result["PlayerData"] as $PlayerName => $flag){
+									if($num !== 0){
+										$members .= ", ";
+									}
+									$members .= $PlayerName;
+									$num++;
+								}
+
+								$sender->sendMessage("[WorldGuard] ".$areaname." - 保護エリア情報\n".
+													"管理者リスト : ".$members."\n".
+													"保護座標: \n".
+													"(".$result["AreaData"][0][0].", ".$result["AreaData"][0][1].", ".$result["AreaData"][0][2].") - \n".
+													"(".$result["AreaData"][1][0].", ".$result["AreaData"][1][1].", ".$result["AreaData"][1][2].")"
+								);
+							}else{
+								$sender->sendMessage("[WorldGuard] 今いる座標は保護エリアではありません。");
+							}
+						}else{			
+							$name = $args[1];
+							if($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()) === false){
+								$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
+								break;
+							}
+							$areadata = $this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName());
+
+							$members = "";
+							$num = 0;
+							foreach($areadata["PlayerData"] as $PlayerName => $flag){
+								if($num !== 0){
+									$members .= ", ";
+								}
+								$members .= $PlayerName;
+								$num++;
+							}
+
+							$sender->sendMessage("[WorldGuard] ".$name." - 保護エリア情報\n".
+												"管理者リスト : ".$members."\n".
+												"保護座標: \n".
+												"(".$areadata["AreaData"][0][0].", ".$areadata["AreaData"][0][1].", ".$areadata["AreaData"][0][2].") - \n".
+												"(".$areadata["AreaData"][1][0].", ".$areadata["AreaData"][1][1].", ".$areadata["AreaData"][1][2].")"
+							);
+						}
+					break;
+					case "addmember":
+						if(!isset($args[1]) or $args[1] === "" or !isset($args[2]) or $args[2] === ""){
+							$sender->sendMessage("使用方法: //region addmember [登録名] [プレーヤー名]");
+							break;
+						}
+
+						$name = $args[1];
+						if($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()) === false){
+							$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
+							break;
+						}
+
+						$this->DataBaseManager->setGuardArea($sender, $name, "update", ["Type" => "addmember", "PlayerName" => $args[2]]);
+					break;
+					case "removemember":
+						if(!isset($args[1]) or $args[1] === "" or !isset($args[2]) or $args[2] === ""){
+							$sender->sendMessage("使用方法: //region removemember [登録名] [プレーヤー名]");
+							break;
+						}
+						$name = $args[1];
+						if($this->DataBaseManager->getGuardArea($name, $sender->getLevel()->getName()) === false){
+							$sender->sendMessage("[WorldGuard] ".$name."は存在しません。");
+							break;
+						}
+
+						$this->DataBaseManager->setGuardArea($sender, $name, "update", ["Type" => "removemember", "PlayerName" => $args[2]]);
+					break;
+					default:
+						$sender->sendMessage("使用方法: //region claim [登録名] 登録\n".
+											"使用方法: //region remove [登録名] 削除\n".
+											"使用方法: //region info [登録名]\n".
+											"使用方法: //region addmember [登録名] [プレーヤー名]\n".
+											"使用方法: //region removemember [登録名] [プレーヤー名]"
+						);
+					break;
+				}
+			break;
+		}
+		return true;
 	}
 
-	public function WG_claim($player,$name,$session){
-		$minx = min($session[1][0], $session[2][0]);
-		$miny = min($session[1][1], $session[2][1]);
-		$minz = min($session[1][2], $session[2][2]);
-		$maxx = max($session[1][0], $session[2][0]);
-		$maxy = max($session[1][1], $session[2][1]);
-		$maxz = max($session[1][2], $session[2][2]);
-                $level = $session[3];
-                $areadata = [$minx,$miny,$minz,$maxx,$maxy,$maxz,$level];
-                $result = $this->dbManager->setNameArea($player,$name,$areadata);
-                if($result){
-			$player->sendMessage("範囲登録に成功しました。");
-                }else{
-			$player->sendMessage("範囲登録に失敗しました。競合が原因だと考えられます。");
-                }
-        }
+	public function onBlockBreak(BlockBreakEvent $event){
+		$player = $event->getPlayer();
+		$block = $event->getBlock();
+		$result = $this->checkGuardArea($player, $block->getX(), $block->getY(), $block->getZ());
+		if($result){
+			$event->setCancelled();
+		}
+	}
 
 	public function onBlockPlace(BlockPlaceEvent $event){
-                $player = $event->getPlayer();
-                $username = $player->getName();
-                $block = $event->getBlock();
-                $areaes = $this->dbManager->getAreaes();
-                foreach($areaes as $playername => $areadataall){
-                        foreach($areadataall as $areaname => $areadata){
-                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
-                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
-                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
-                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username and $block->getLevel()->getName() === $areadata["level"]){
-                                                                $event->setCancelled();
-                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
-                }
-        }
+		$player = $event->getPlayer();
+		$block = $event->getBlock();
+		$result = $this->checkGuardArea($player, $block->getX(), $block->getY(), $block->getZ());
+		if($result){
+			$event->setCancelled();
+		}
+	}
 
-	public function onBlockBreak(BlockBreakEvent $event){
-                $player = $event->getPlayer();
-                $username = $player->getName();
-                $block = $event->getBlock();
-                $areaes = $this->dbManager->getAreaes();
-                foreach($areaes as $playername => $areadataall){
-                        foreach($areadataall as $areaname => $areadata){
-                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
-                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
-                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
-                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username){
-                                                                $event->setCancelled();
-                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
-                }
-        }
+	public function onBlockUpdate(BlockUpdateEvent $event){
+		$block = $event->getBlock();
+		//TODO: WorldEditor Plugin
+	}
 
-	public function onPlayerTouch(PlayerInteractEvent $event){
-                $player = $event->getPlayer();
-                $username = $player->getName();
-                $block = $event->getBlock();
-                $areaes = $this->dbManager->getAreaes();
-                foreach($areaes as $playername => $areadataall){
-                        foreach($areadataall as $areaname => $areadata){
-                                for($x = $areadata["min"][0]; $x <= $areadata["max"][0]; $x++){
-                                        for($y = $areadata["min"][1]; $y <= $areadata["max"][1]; $y++){
-                                                for($z = $areadata["min"][1]; $z <= $areadata["max"][1]; $z++){
-                                                        if($block->x === $x and $block->y === $y and $block->z === $z and $playername != $username){
-                                                                $event->setCancelled();
-                                                                $player->sendMessage("このエリアは保護されています。(".$playername.")さんのエリア。");
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
-                }
-        }
+	public function onBlockTouch(PlayerInteractEvent $event){
+		$player = $event->getPlayer();
+		$block = $event->getBlock();
+		$result = $this->checkGuardArea($player, $block->getX(), $block->getY(), $block->getZ());
+		if($result){
+			$event->setCancelled();
+		}
+	}
+
+	public function checkGuardArea($player, $x, $y, $z){
+		$result = $this->DataBaseManager->getGuardAreaInPosition($player->getLevel()->getName(), (int) $x, (int) $y, (int) $z, $areaname);
+		if(is_array($result) and isset($result["PlayerData"])){
+			if(!isset($result["PlayerData"][$player->getName()])){
+				$player->sendMessage("[WorldGuard] このエリアは保護されています。 詳細は//region info ".$areaname);
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

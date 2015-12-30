@@ -83,8 +83,8 @@ class DatabaseManager{
 					switch($areadata["Type"]){
 						case "addmember":
 							if(isset($areadata["PlayerName"]) and isset($this->GuardData[$player->getLevel()->getName()][$areaname])){
-								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$player->getName()])){
-									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$areadata["PlayerName"]])){
+								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$player->getName()])){
+									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]])){
 										$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の管理者です。");
 									}else{
 										$this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]] = false;

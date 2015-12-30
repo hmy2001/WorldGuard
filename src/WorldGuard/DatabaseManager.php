@@ -105,7 +105,7 @@ class DatabaseManager{
 						case "removemember":
 							if(isset($areadata["PlayerName"]) and isset($this->GuardData[$player->getLevel()->getName()][$areaname])){
 								if(isset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]])){
-									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname][$player->getName()])){
+									if(isset($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$player->getName()])){
 										if($this->GuardData[$player->getLevel()->getName()][$areaname]["PlayerData"][$areadata["PlayerName"]]){
 											$player->sendMessage("[WorldGuard] ".$areadata["PlayerName"]."さんは".$areaname."の絶対的管理者なので削除できません。");
 										}else{

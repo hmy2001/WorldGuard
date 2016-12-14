@@ -30,9 +30,9 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 		$this->PluginSession = new PluginSession();
 		if(!$this->PluginSession->Enabled()){
 			if($this->PluginSession->getPluginName() === ""){
-				$this->getLogger()->info(TextFormat::RED.$this->PluginSession->getPluginName().TextFormat::YELLOW."を最新版にしてください！！");
-			}else{
 				$this->getLogger()->info(TextFormat::RED."WorldEditor".TextFormat::YELLOW."か".TextFormat::RED."WEdit".TextFormat::YELLOW."が読み込みされていません！！");
+			}else{
+				$this->getLogger()->info(TextFormat::RED.$this->PluginSession->getPluginName().TextFormat::YELLOW."を最新版にしてください！！");
 			}
 			$this->getServer()->shutdown();
 		}else{
@@ -216,6 +216,9 @@ class WorldGuard extends PluginBase implements Listener, CommandExecutor{
 
 	public function onBlockUpdate(BlockUpdateEvent $event){
 		$block = $event->getBlock();
+		if(!$event instanceof BlockPlaceEvent and !$event instanceof BlockBreakEvent){
+			
+		}
 		//TODO: WorldEditor Plugin
 	}
 
